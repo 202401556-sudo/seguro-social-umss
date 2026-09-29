@@ -69,4 +69,50 @@ router.post('/login', async (req, res) => {
   }
 })
 
+router.post('/register', async (req, res) => {
+  const { correo, contrasena, nombre } = req.body
+
+  if (!correo || !contrasena || !nombre) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' })
+  }
+   if (!correo.endsWith('@gmail.com')) {
+    return res.status(400).json({ error: 'Debes registrarte con un correo de Gmail' })
+  }
+  if (contrasena.length < 8) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' })
+  }
+
+  try {
+    const existente = await pool.query('SELECT id FROM users WHERE correo = $1', [correo])
+    if (existente.rows.length > 0) {
+      return res.status(409).json({ error: 'Ya existe una cuenta con ese correo' })
+    }
+
+    const hash = await bcrypt.hash(contrasena, 10)
+    const { rows } = await pool.query(
+      'INSERT INTO users (correo, contrasena_hash, nombre) VALUES ($1, $2, $3) RETURNING id, correo, nombre',
+      [correo, hash, nombre]
+    )
+
+    const user = rows[0]
+    const token = jwt.sign(
+      { sub: user.id, correo: user.correo },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    )
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 2 * 60 * 60 * 1000,
+    })
+
+    res.status(201).json({ user })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Error del servidor' })
+  }
+})
+
 export default router
