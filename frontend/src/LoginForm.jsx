@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function LoginForm({ onLogin }) {
+  export default function LoginForm({ onLogin, onIrRegistro }) {
   const [correo, setCorreo] = useState('')
   const [contrasena, setContrasena] = useState('')
   const [mostrar, setMostrar] = useState(false)
@@ -64,6 +64,13 @@ export default function LoginForm({ onLogin }) {
         {cargando ? 'Ingresando...' : 'Iniciar Sesión'}
       </button>
       <button className="btn-google" type="button">Iniciar con Google</button>
+
+      <p style={{ textAlign: 'center', marginTop: 14, fontSize: 14 }}>
+        ¿No tienes cuenta?{' '}
+         <button type="button" className="link-registro" onClick={onIrRegistro}>
+         Regístrate
+         </button>
+        </p>
     </form>
   )
 }

@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import LoginForm from './LoginForm'
+import RegisterForm from './RegisterForm'
 import './App.css'
 
 export default function App() {
   const [usuario, setUsuario] = useState(null)
+  const [vista, setVista] = useState('login') // 'login' o 'registro'
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+      .then((res) => res.ok ? res.json() : null)
+      .then((datos) => { if (datos) setUsuario(datos) })
+  }, [])
 
   return (
     <>
@@ -20,8 +28,10 @@ export default function App() {
               Salir
             </button>
           </div>
+        ) : vista === 'login' ? (
+          <LoginForm onLogin={setUsuario} onIrRegistro={() => setVista('registro')} />
         ) : (
-          <LoginForm onLogin={setUsuario} />
+          <RegisterForm onRegister={setUsuario} onVolver={() => setVista('login')} />
         )}
       </main>
     </>
