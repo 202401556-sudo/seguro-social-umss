@@ -75,6 +75,9 @@ router.post('/register', async (req, res) => {
   if (!correo || !contrasena || !nombre) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' })
   }
+   if (!correo.endsWith('@gmail.com')) {
+    return res.status(400).json({ error: 'Debes registrarte con un correo de Gmail' })
+  }
   if (contrasena.length < 8) {
     return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' })
   }

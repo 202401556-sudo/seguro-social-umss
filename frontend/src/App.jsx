@@ -17,7 +17,7 @@ export default function App() {
     <>
       <header className="barra">
         <span>Seguro social universitario</span>
-        <span>{usuario ? usuario.nombre : 'Iniciar Sesión'}</span>
+        
       </header>
       <main className="contenido">
         {usuario ? (
