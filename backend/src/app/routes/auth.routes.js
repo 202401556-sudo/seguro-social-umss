@@ -2,6 +2,7 @@ import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import { config } from '../../core/config.js'
 import * as AuthService from '../../services/auth.service.js'
+import passport from '../passport.js'
 
 const router = Router()
 
@@ -48,5 +49,31 @@ router.get('/me', (req, res) => {
     res.status(401).json({ error: 'Token inválido' })
   }
 })
+
+ router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email'],
+  session: false,
+}))
+
+router.get('/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: `${config.frontendUrl}/login-error` }),
+  (req, res) => {
+    const user = req.user
+    const token = jwt.sign(
+      { sub: user.id, correo: user.correo },
+      config.jwtSecret,
+      { expiresIn: '2h' }
+    )
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 2 * 60 * 60 * 1000,
+    })
+
+    res.redirect(config.frontendUrl)
+  }
+)
 
 export default router

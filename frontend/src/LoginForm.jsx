@@ -63,7 +63,13 @@ import { useState } from 'react'
       <button className="btn-principal" type="submit" disabled={cargando}>
         {cargando ? 'Ingresando...' : 'Iniciar Sesión'}
       </button>
-      <button className="btn-google" type="button">Iniciar con Google</button>
+          <button
+            className="btn-google"
+            type="button"
+           onClick={() => window.location.href = 'http://localhost:3000/api/auth/google'}
+          >
+            Iniciar con Google
+          </button>
 
       <p style={{ textAlign: 'center', marginTop: 14, fontSize: 14 }}>
         ¿No tienes cuenta?{' '}
